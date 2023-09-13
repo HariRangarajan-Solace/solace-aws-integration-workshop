@@ -1,6 +1,6 @@
 ---
 title: "AWS Workshop Template--to be removed once done"
-weight: 0
+weight: 9
 ---
 
 # AWS WORKSHOP TEMPLATE

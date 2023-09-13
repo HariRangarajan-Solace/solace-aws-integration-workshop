@@ -1,0 +1,1 @@
+find . -type f -name "_index.en.md" -exec sh -c 'mv "$0" "${0/_index.en.md/index.en.md}"'  {} \;
