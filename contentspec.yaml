@@ -4,7 +4,65 @@ defaultLocaleCode: en-US
 localeCodes:
   - en-US
 
-params:
-  hello: world
-  foo:
-    - bar
+awsAccountConfig:
+  accountSources:
+    - WorkshopStudio
+  regionConfiguration:
+    deployableRegions:
+      required:
+        - ap-northest-1
+    minAccessibleRegions: 1
+    maxAccessibleRegions: 3
+    accessibleRegions:
+      required:
+        - ap-northest-1
+        - us-east-1
+        - us-west-1
+  serviceLinkedRoles:
+    - appsync.amazonaws.com
+  participantRole:
+    managedPolicies:
+      - "arn:aws:iam::aws:policy/IAMReadOnlyAccess"
+      - "arn:aws:iam::aws:policy/ReadOnlyAccess"
+      #s3 bucket, Cloud9, Lambda, OpenSearch?? IAM
+    iamPolicies:
+
+    trustedPrincipals:
+      # List of AWS service principals
+      service: 
+        - ec2.amazonaws.com
+        - lambda.amazonaws.com      
+  ec2KeyPair: false
+
+infrastructure:
+
+  # A list of CloudFormation templates that are present in the content's repository.
+  # These CloudFormation templates will be used by Workshop Studio's provisioning process and will be deployed to AWS accounts.
+  # Note: The order of CloudFormation templates defined here will be the same order that Workshop Studio will deploy them to
+  # the AWS accounts. Make sure the CloudFormation templates are in the correct order if some depend on others.
+  cloudformationTemplates:
+
+      # The template's location relative to the root of the content's repo. 
+      # Note: Templates must be located in the `static/` directory
+    - templateLocation: static/aws-solace-workshop.yaml
+
+      # Friendly name for the corresponding cloudformation template.
+      label: EC2 Stack
+
+      # [OPTIONAL] List of parameters defined within the corresponding stack alongside
+      # the value that should be used for them. Any CloudFormation parameter that does not
+      # have a default value should be defined here with a default value.
+      parameters:
+          # Workshop Studio supports "Magic Variables" in the `defaultValue` of CloudFormation Template parameters
+        - templateParameter: ParticipantRoleArn
+          defaultValue: "{{.ParticipantRoleArn}}"
+        - templateParameter: AssetsBucketName
+          defaultValue: "{{.AssetsBucketName}}"
+        - templateParameter: AssetsBucketPrefix
+          defaultValue: "{{.AssetsBucketPrefix}}"
+
+
+
+
+
+
