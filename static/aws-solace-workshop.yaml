@@ -1,0 +1,420 @@
+# Author: Hari Rangarajan
+# Project: Solace-AWS Workshop
+# This version does the following :
+# - Creates all the n/w setups
+# - Creates a cloudformation template to use this subnet
+
+Metadata:
+  License: Apache-2.0
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'This template will create required infrastructure for AWS and solace '
+
+Resources:
+  solacesecwkspvpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: 'true'
+      EnableDnsHostnames: 'true'
+      Tags:
+        - Key: stack
+          Value: solace-workshop
+        - Key: Name
+          Value: solace-wrksp-vpc
+  solacesecig: #Internet Gateway
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: stack
+          Value: production
+        - Key: Name
+          Value: solace-wrksp-ig
+  AttachGateway: #Attach Internet Gateway
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId:
+        Ref: solacesecwkspvpc
+      InternetGatewayId:
+        Ref: solacesecig
+  # Lets create two public subnets
+  publsubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: solacesecwkspvpc
+      CidrBlock: 10.0.3.0/24
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: "ap-northeast-1a"
+      Tags:
+        - Key: stack
+          Value: solace-workshop
+        - Key: Name
+          Value: solace-wrksp-pub-sub-1
+  publsubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: solacesecwkspvpc
+      CidrBlock: 10.0.4.0/24
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: "ap-northeast-1a"
+      Tags:
+        - Key: stack
+          Value: solace-workshop
+        - Key: Name
+          Value: solace-wrksp-pub-sub-2
+
+  # Lets create public route tables and associate them with subnets.
+  PubRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: solacesecwkspvpc
+      Tags:
+        - Key: stack
+          Value: solace-workshop
+        - Key: Name
+          Value: public-route-table
+  PubSubnetRouteTableAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: publsubnet1
+      RouteTableId:
+        Ref: PubRouteTable
+  PubSubnetRouteTableAssociation2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: publsubnet2
+      RouteTableId:
+        Ref: PubRouteTable
+  # Lets add default route to internet gateway from public subnet. This will ensure that
+  # route to internet is via IG
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: solacesecig
+    Properties:
+      RouteTableId:
+        Ref: PubRouteTable
+      DestinationCidrBlock: "0.0.0.0/0"
+      GatewayId:
+        Ref: solacesecig
+
+  # Lets create security group and assign ingress traffic rules.
+  PubSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow inbound traffic on TCP ports 22, 8081, and 7888
+      VpcId:
+        Ref: solacesecwkspvpc
+      Tags:
+        - Key: stack
+          Value: solace-workshop
+        - Key: Name
+          Value: PubSecurityGroup
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          CidrIp: "0.0.0.0/0"
+          FromPort: 22
+          ToPort: 22
+        - IpProtocol: tcp
+          CidrIp: "0.0.0.0/0"
+          FromPort: 8081
+          ToPort: 8081
+        - IpProtocol: tcp
+          CidrIp: "0.0.0.0/0"
+          FromPort: 7888
+          ToPort: 7888
+  PubCommunication:
+    Type: "AWS::EC2::SecurityGroupIngress"
+    Properties:
+      IpProtocol: tcp
+      CidrIp: "0.0.0.0/0"
+      FromPort: 22
+      ToPort: 22
+      GroupId: !Ref PubSecurityGroup
+      Tags:
+        - Key: Name
+          Value: PubCommunicationRt
+
+  # Lets create NAT Gateway and EIP before creating private subnets & routes.
+  NATGatewayEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+    DependsOn: AttachGateway
+
+  NATGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NATGatewayEIP.AllocationId
+      SubnetId:
+        Ref: publsubnet2
+      Tags:
+        - Key: stack
+          Value: production
+        - Key: Name
+          Value: aws-solace-sec-ng
+
+
+  # Lets create two private subnets
+  prvtsubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: solacesecwkspvpc
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: "ap-northeast-1a"
+      Tags:
+        - Key: stack
+          Value: solace-workshop
+        - Key: Name
+          Value: solace-wrksp-pvt-sub-1
+  prvtsubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: solacesecwkspvpc
+      CidrBlock: 10.0.2.0/24
+      AvailabilityZone: "ap-northeast-1a"
+      Tags:
+        - Key: stack
+          Value: solace-workshop
+        - Key: Name
+          Value: solace-wrksp-pvt-sub-2
+
+  # Private Route table
+  PvtRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: solacesecwkspvpc
+      Tags:
+        - Key: stack
+          Value: solace-workshop
+        - Key: Name
+          Value: private-route-table
+
+  # Associate route table to subnet
+  PvtSubnetRouteTableAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: prvtsubnet1
+      RouteTableId:
+        Ref: PvtRouteTable
+  PvtSubnetRouteTableAssociation2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: prvtsubnet2
+      RouteTableId:
+        Ref: PvtRouteTable
+
+  # Private Subnet will have routes to NAT Gateway for public internet access
+  # This is needed for solace HSM access. Ideally it should be based on private link
+  # HSM and private link access will come in later phases.
+
+  RouteNATGateway:
+    DependsOn: NATGateway
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: PvtRouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId:
+        Ref: NATGateway
+
+  # Private Security Group
+  PvtSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: This will allow traffic SSH to instances from local
+      VpcId:
+        Ref: solacesecwkspvpc
+      Tags:
+        - Key: stack
+          Value: solace-workshop
+        - Key: Name
+          Value: PvtSecurityGroup
+
+  # Lets add private security group rules
+  PrivateSecRules:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      IpProtocol: tcp
+      FromPort: 22
+      ToPort: 22
+      SourceSecurityGroupId:
+        Fn::GetAtt:
+          - PubSecurityGroup
+          - GroupId
+      GroupId:
+        Fn::GetAtt:
+          - PvtSecurityGroup
+          - GroupId
+
+  C9IDE:
+    Type: 'AWS::Cloud9::EnvironmentEC2'
+    Properties:
+      Name: Solace-AWS-Cloud9
+      Description: Cloud9 IDE for the Solace-AWS workshop
+      AutomaticStopTimeMinutes: 30
+      SubnetId:
+        Ref: publsubnet1
+      InstanceType: t2.small
+      Repositories:
+        - RepositoryUrl: 'https://github.com/SolaceLabs/solace-aws-integration.git'
+          PathComponent: 'solace-aws-integration'
+
+  #define S3 bucket, and the user 'SolaceS3ConnectorUser' with the access right to the bucket
+  SolaceDataS3Bucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: 
+        Fn::Sub: 
+          - "solace-workshop-${AccountId}"
+          - AccountId: !Ref "AWS::AccountId"
+
+
+  SolaceS3ConnectorUser:
+    Type: 'AWS::IAM::User'
+    Properties:
+      UserName: SolaceS3Connector
+
+  
+  SolaceS3ConnectorAccessKey:
+    Type: 'AWS::IAM::AccessKey'
+    Properties:
+      UserName: SolaceS3Connector
+    DependsOn: SolaceS3ConnectorUser
+
+  SolaceS3ConnectorUserPolicy:
+    Type: 'AWS::IAM::UserPolicy'
+    Properties:
+      PolicyName: S3FullAccessPolicy
+      UserName: SolaceS3Connector
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - 's3:*'
+            Resource:
+              - Fn::Sub: "arn:aws:s3:::${SolaceDataS3Bucket}"
+              - Fn::Sub: "arn:aws:s3:::${SolaceDataS3Bucket}/*"
+    DependsOn: SolaceS3ConnectorUser
+
+
+  # The following is OpenSearch related configuration
+
+
+
+  DataAccessPolicy:
+    Type: 'AWS::OpenSearchServerless::AccessPolicy'
+    Properties:
+      Name: solacedashboard-access-policy
+      Type: data
+      Description: Access policy for solacedashboard collection
+      Policy: !Sub >-
+        [{"Description":"Access for cfn user","Rules":[{"ResourceType":"index","Resource":["index/*/*"],"Permission":["aoss:*"]},
+        {"ResourceType":"collection","Resource":["collection/solacedashboard"],"Permission":["aoss:*"]}],
+        "Principal": ["arn:aws:iam::${AWS::AccountId}:role/Admin-OneClick", "arn:aws:iam::${AWS::AccountId}:role/Admin-OneClick"]}]
+  NetworkPolicy:
+    Type: 'AWS::OpenSearchServerless::SecurityPolicy'
+    Properties:
+      Name: solacedashboard-network-policy
+      Type: network
+      Description: Network policy for solacedashboard collection
+      Policy: >-
+        [{"Rules":[{"ResourceType":"collection","Resource":["collection/solacedashboard"]}, {"ResourceType":"dashboard","Resource":["collection/solacedashboard"]}],"AllowFromPublic":true}]
+  EncryptionPolicy:
+    Type: 'AWS::OpenSearchServerless::SecurityPolicy'
+    Properties:
+      Name: solacedashboard-security-policy
+      Type: encryption
+      Description: Encryption policy for solacedashboard collection
+      Policy: >-
+        {"Rules":[{"ResourceType":"collection","Resource":["collection/solacedashboard"]}],"AWSOwnedKey":true}
+  OpenSearchCollection:
+    Type: 'AWS::OpenSearchServerless::Collection'
+    Properties:
+      Name: solacedashboard
+      Type: TIMESERIES
+      Description: Collection to holds timeseries data
+    DependsOn: EncryptionPolicy
+
+#Define Lambda function role
+  SolaceWorkshopLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: solace_workshop_lambda_role
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  SolaceWorkshopS3ReadOnlyRolePolicy:
+    Type: AWS::IAM::RolePolicy
+    Properties:
+      RoleName: !Ref SolaceWorkshopLambdaRole
+      PolicyName: solace_workshop_s3_readonly_policy
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:GetObject
+              - s3:ListBucket
+            Resource:
+              - Fn::Sub: "arn:aws:s3:::${SolaceDataS3Bucket}"
+              - Fn::Sub: "arn:aws:s3:::${SolaceDataS3Bucket}/*"
+
+  SolaceWorkshopPolicyLambdaIngestionRolePolicy:
+    Type: AWS::IAM::RolePolicy
+    Properties:
+      RoleName: !Ref SolaceWorkshopLambdaRole
+      PolicyName: solace_workshop_policy_opensearch_ingestion
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - "aoss:DashboardsAccessAll"
+              - "aoss:APIAccessAll"
+            Resource: "*"
+
+
+Outputs:
+  S3BucketName:
+    Description: Name of the S3 bucket
+    Value: !Ref SolaceDataS3Bucket
+
+  EndpointURL:
+    Value: !GetAtt OpenSearchCollection.CollectionEndpoint
+
+  DashboardURL:
+    Value: !GetAtt OpenSearchCollection.DashboardEndpoint
+
+  CollectionARN:
+    Value: !GetAtt OpenSearchCollection.Arn
+
+  SolaceS3ConnectorUserAccessKey:
+    Description: "Access Key ID for the Solace S3 Connector user"
+    Value: !Ref SolaceS3ConnectorAccessKey
+    Export:
+      Name: SolaceS3ConnectorUserAccessKey
+
+  SolaceS3ConnectorUserSecretKey:
+    Description: "Secret Access Key for the Solace S3 Connector user"
+    Value: !GetAtt SolaceS3ConnectorAccessKey.SecretAccessKey
+    Export:
+      Name: SolaceS3ConnectorUserSecretKey
+
