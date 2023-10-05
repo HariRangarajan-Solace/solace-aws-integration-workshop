@@ -2,7 +2,18 @@
     "Version": "2012-10-17",
     "Statement": [
         {
-            "Sid": "Statement1",
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:AuthorizeSecurityGroupEgress",
+                "ec2:AuthorizeSecurityGroupIngress",
+                "ec2:CreateSecurityGroup",
+                "ec2:ModifySecurityGroupRules"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "VisualEditor0",
             "Effect": "Allow",
             "Action": [
                 "aoss:*"

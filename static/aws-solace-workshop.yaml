@@ -278,7 +278,7 @@ Resources:
       AutomaticStopTimeMinutes: 30
       SubnetId:
         Ref: publsubnet1
-      InstanceType: t2.small
+      InstanceType: t3.small
       Repositories:
         - RepositoryUrl: 'https://github.com/SolaceLabs/solace-aws-integration.git'
           PathComponent: 'solace-aws-integration'
