@@ -269,6 +269,7 @@ Resources:
           - PvtSecurityGroup
           - GroupId
 
+# Next step, it is probably better to change the 'WSParticipantRole/Participant' with input parameter. 
   C9IDE:
     Type: 'AWS::Cloud9::EnvironmentEC2'
     Properties:
@@ -282,7 +283,7 @@ Resources:
         - RepositoryUrl: 'https://github.com/SolaceLabs/solace-aws-integration.git'
           PathComponent: 'solace-aws-integration'
       OwnerArn: !Sub >-
-        arn:aws:iam::124930939715:assumed-role/${ParticipantRoleArn}/*
+        arn:aws:iam::${AWS::AccountId}:assumed-role/WSParticipantRole/Participant
 
   #define S3 bucket, and the user 'SolaceS3ConnectorUser' with the access right to the bucket
   SolaceDataS3Bucket:
