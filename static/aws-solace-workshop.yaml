@@ -297,7 +297,7 @@ Resources:
               - cloud9:DescribeEnvironmentMemberships
               - cloud9:DescribeEnvironments
               - cloud9:UpdateEnvironment
-            Resource: !GetAtt Cloud9Environment.Arn
+            Resource: !GetAtt C9IDE.Arn
       Roles:
         - !Ref ParticipantRoleArn
 
