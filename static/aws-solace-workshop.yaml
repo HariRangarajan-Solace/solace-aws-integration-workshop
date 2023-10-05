@@ -281,8 +281,8 @@ Resources:
       Repositories:
         - RepositoryUrl: 'https://github.com/SolaceLabs/solace-aws-integration.git'
           PathComponent: 'solace-aws-integration'
-
-
+      OwnerArn: !Sub >-
+        arn:aws:iam::124930939715:assumed-role/${ParticipantRoleArn}/*
 
   #define S3 bucket, and the user 'SolaceS3ConnectorUser' with the access right to the bucket
   SolaceDataS3Bucket:
