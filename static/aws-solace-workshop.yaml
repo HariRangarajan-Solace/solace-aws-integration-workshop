@@ -281,7 +281,7 @@ Resources:
       Repositories:
         - RepositoryUrl: 'https://github.com/SolaceLabs/solace-aws-integration.git'
           PathComponent: 'solace-aws-integration'
-      OwnerArn: !Ref ParticipantRoleArn
+
 
   Cloud9EnvironmentPolicy:
     Type: AWS::IAM::Policy
