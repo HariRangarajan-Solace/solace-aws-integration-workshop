@@ -9,6 +9,19 @@ Metadata:
 AWSTemplateFormatVersion: '2010-09-09'
 Description: 'This template will create required infrastructure for AWS and solace '
 
+Parameters:
+  ParticipantRoleArn:
+    Type: String
+    Description: The role of the participant
+  AssetsBucketName:
+    Type: String
+    Description: The bucket---so far, not used
+  AssetsBucketPrefix:
+    Type: String
+    Description: The prefix of the bucket---so far, not used
+
+
+
 Resources:
   solacesecwkspvpc:
     Type: AWS::EC2::VPC
@@ -320,7 +333,7 @@ Resources:
       Policy: !Sub >-
         [{"Description":"Access for cfn user","Rules":[{"ResourceType":"index","Resource":["index/*/*"],"Permission":["aoss:*"]},
         {"ResourceType":"collection","Resource":["collection/solacedashboard"],"Permission":["aoss:*"]}],
-        "Principal": ["arn:aws:iam::${AWS::AccountId}:role/Admin-OneClick", "arn:aws:iam::${AWS::AccountId}:role/Admin-OneClick"]}]
+        "Principal": [!Ref ParticipantRoleArn]}]
   NetworkPolicy:
     Type: 'AWS::OpenSearchServerless::SecurityPolicy'
     Properties:

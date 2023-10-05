@@ -54,12 +54,12 @@ infrastructure:
       # have a default value should be defined here with a default value.
       parameters:
           # Workshop Studio supports "Magic Variables" in the `defaultValue` of CloudFormation Template parameters
-        #- templateParameter: ParticipantRoleArn
-        #  defaultValue: "{{.ParticipantRoleArn}}"
-        #- templateParameter: AssetsBucketName
-        #  defaultValue: "{{.AssetsBucketName}}"
-        #- templateParameter: AssetsBucketPrefix
-        #  defaultValue: "{{.AssetsBucketPrefix}}"
+        - templateParameter: ParticipantRoleArn
+          defaultValue: "{{.ParticipantRoleArn}}"
+        - templateParameter: AssetsBucketName
+          defaultValue: "{{.AssetsBucketName}}"
+        - templateParameter: AssetsBucketPrefix
+          defaultValue: "{{.AssetsBucketPrefix}}"
 
 
 
