@@ -281,6 +281,25 @@ Resources:
       Repositories:
         - RepositoryUrl: 'https://github.com/SolaceLabs/solace-aws-integration.git'
           PathComponent: 'solace-aws-integration'
+      OwnerArn: !Ref ParticipantRoleArn
+
+  Cloud9EnvironmentPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: Cloud9EnvironmentPolicy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - cloud9:CreateEnvironmentEC2
+              - cloud9:DeleteEnvironment
+              - cloud9:DescribeEnvironmentMemberships
+              - cloud9:DescribeEnvironments
+              - cloud9:UpdateEnvironment
+            Resource: !GetAtt Cloud9Environment.Arn
+      Roles:
+        - !Ref ParticipantRoleArn
 
   #define S3 bucket, and the user 'SolaceS3ConnectorUser' with the access right to the bucket
   SolaceDataS3Bucket:

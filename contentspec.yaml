@@ -24,8 +24,13 @@ awsAccountConfig:
     managedPolicies:
       - "arn:aws:iam::aws:policy/IAMReadOnlyAccess"
       - "arn:aws:iam::aws:policy/ReadOnlyAccess"
+      - "arn:aws:iam::aws:policy/AmazonOpenSearchServiceFullAccess"
+      - "arn:aws:iam::aws:policy/AWSLambda_FullAccess"
+      - "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+      - "arn:aws:iam::aws:policy/AWSCloud9User"
       #s3 bucket, Cloud9, Lambda, OpenSearch?? IAM
     iamPolicies:
+      - static/iam_policy.json
 
     trustedPrincipals:
       # List of AWS service principals
