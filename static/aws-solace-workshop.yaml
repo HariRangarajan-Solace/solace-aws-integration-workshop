@@ -281,8 +281,6 @@ Resources:
       Repositories:
         - RepositoryUrl: 'https://github.com/SolaceLabs/solace-aws-integration.git'
           PathComponent: 'solace-aws-integration'
-      OwnerArn: !Sub >- 
-        ${ParticipantRoleArn}
 
 
 
