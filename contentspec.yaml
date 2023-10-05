@@ -28,6 +28,7 @@ awsAccountConfig:
       - "arn:aws:iam::aws:policy/AWSLambda_FullAccess"
       - "arn:aws:iam::aws:policy/AmazonS3FullAccess"
       - "arn:aws:iam::aws:policy/AWSCloud9User"
+      - "arn:aws:iam::aws:policy/AmazonEventBridgeFullAccess"
       #s3 bucket, Cloud9, Lambda, OpenSearch?? IAM
     iamPolicies:
       - static/iam_policy.json
