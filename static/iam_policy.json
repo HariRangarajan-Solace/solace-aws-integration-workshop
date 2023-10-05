@@ -2,7 +2,7 @@
     "Version": "2012-10-17",
     "Statement": [
         {
-            "Sid": "VisualEditor0",
+            "Sid": "Ec2Statement",
             "Effect": "Allow",
             "Action": [
                 "ec2:AuthorizeSecurityGroupEgress",
@@ -13,7 +13,7 @@
             "Resource": "*"
         },
         {
-            "Sid": "VisualEditor0",
+            "Sid": "OpenSearchServerlessStatement",
             "Effect": "Allow",
             "Action": [
                 "aoss:*"
