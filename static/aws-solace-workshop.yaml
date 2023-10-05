@@ -3,11 +3,12 @@
 # This version does the following :
 # - Creates all the n/w setups
 # - Creates a cloudformation template to use this subnet
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'This template will create required infrastructure for AWS and solace '
 
 Metadata:
   License: Apache-2.0
-AWSTemplateFormatVersion: '2010-09-09'
-Description: 'This template will create required infrastructure for AWS and solace '
+
 
 Parameters:
   ParticipantRoleArn:
@@ -333,7 +334,7 @@ Resources:
       Policy: !Sub >-
         [{"Description":"Access for cfn user","Rules":[{"ResourceType":"index","Resource":["index/*/*"],"Permission":["aoss:*"]},
         {"ResourceType":"collection","Resource":["collection/solacedashboard"],"Permission":["aoss:*"]}],
-        "Principal": [!Ref ParticipantRoleArn]}]
+        "Principal": [${ParticipantRoleArn}]}]
   NetworkPolicy:
     Type: 'AWS::OpenSearchServerless::SecurityPolicy'
     Properties:
