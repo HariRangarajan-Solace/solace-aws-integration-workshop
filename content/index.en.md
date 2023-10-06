@@ -1,10 +1,9 @@
 ---
-title: "Accelerate Capital Market Data Transfer with Solace Event-Driven Architecture on AWS"
+title: "SOLACE EDA X AWS: Market Data Consumption"
 chapter: true
 weight: 1
 ---
 
-# Solace EDA x AWS: Rapid Market Data Migration
 
 ![Solace Logo](/static/images/logos/Solace_Logo.png)
 

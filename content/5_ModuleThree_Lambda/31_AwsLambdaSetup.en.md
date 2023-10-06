@@ -12,7 +12,9 @@ In this section, we will be setting up an AWS Lambda function using a Java artif
 - Open the [Functions page](https://console.aws.amazon.com/lambda/home#/functions) of the Lambda console.
 - Choose **Create function**
 - Select **Author from scratch**
-- Enter the name as : _tokyo-summary-event-generator_ and the Runtime as _Java 11_
+- Enter the name as : any name of your choice
+- and the Runtime as : _Java 11_
+- also choose the executiong role as: _solace_workshop_lambda_role_, which is predefined.
 - Click on **Create function**
 Below is a screenshot which demonstrates the steps
 ![Lambda-create-function](/static/images/moduleThree/lambda-create-function.png)
