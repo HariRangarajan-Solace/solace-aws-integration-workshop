@@ -1,5 +1,5 @@
 ---
-title: "6. Set up dashboard"
+title: "5. Set up dashboard"
 chapter: true
 weight: 7
 ---

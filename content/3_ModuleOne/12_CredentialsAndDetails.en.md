@@ -34,7 +34,7 @@ The hostname and credentials of the newly created broker which we will call as *
 ![Broker Console - Connect](/static/images/moduleOne/brokerconsole_connect.png)
 
 This tab lists the credentials and protocol specific host urls that must be used while connecting to the Solace broker using a supported client library. \
-We need two set of connection details as below : \
+We need two set of connection details as below : 
 
 #### Step 1
 **Credentials for using in the Spring Java application** \
@@ -80,4 +80,4 @@ Make sure that you enable the following permissions during the process :
 The service id of the **Initiator** broker service that you have created.
     The easiest way to grab this is from the url on the service details screen as below :
 ![Service details - ServiceId highlighted](/static/images/moduleOne/service_details.png) 
-The id is the alphanumeric value that comes after the _services/_
+The id is the alphanumeric value that comes after the **services/**

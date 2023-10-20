@@ -68,7 +68,7 @@ Change the following parameters with the values that you have collected earlier 
 - solace.semp.password : SEMP password collected in point# 2 of the **Initiator** broker
 - solace.semo.brokername : SEMP message VPN name collected in point# 2 of the **Initiator** broker
 - solace.restApiToken : API token for the Solace Cloud REST APIs. This is specified in the section **Credentials and required connection details - Section 2 - Step 4**
-- server.ip : The public IP of the EC2 instance linked to the Cloud9 instance. You can find it by running the command curl `http://169.254.169.254/latest/meta-data/public-ipv4`
+- server.ip : The public IP of the EC2 instance linked to the Cloud9 instance. You can find it by running the command `curl http://169.254.169.254/latest/meta-data/public-ipv4`
 - solace.serviceId : The service id of the **Initiator** broker. This is specified in the section **Credentials and required connection details - Section 2 - Step 5**
 
 ### Step 3: Build and run the Administration application
