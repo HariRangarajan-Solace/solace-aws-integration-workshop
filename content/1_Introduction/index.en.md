@@ -46,6 +46,4 @@ This workshop is divided into the sections listed below. Plan on 3-4 hours to co
 [x] Module 4 : Setting up an AWS S3 bucket and integrate with the Solace native connector *(40 minutes)* \
 [x] Module 5 : Visualize S3 data using Amazon Quicksight *(30 minutes)*
 
-{{% notice warning %}}
-The examples and sample code provided in this workshop are intended to be consumed as instructional content. These will help you understand how various AWS services can be architected to build a solution while demonstrating best practices along the way. These examples are not intended for use in production environments.
-{{% /notice %}}
+> The examples and sample code provided in this workshop are intended to be consumed as instructional content. These will help you understand how various AWS services can be architected to build a solution while demonstrating best practices along the way. These examples are not intended for use in production environments.
